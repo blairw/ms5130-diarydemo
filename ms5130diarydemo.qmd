@@ -1,0 +1,75 @@
+---
+title: "ms5130diarydemo"
+author: Blair Wang
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-expand: 2
+    toc-title: Contents
+    toc-depth: 3
+---
+
+# Disclaimer
+
+This file is provided to students taking the class _MS5130 Applied Analytics in Business and Society_ at the University of Galway.
+This file is provided only to give an example of how to set up a Quarto document that contains the fundamental structure required for a "diary".
+
+::: {.callout-important}
+# Warning!
+
+This file is NOT to be considered a "standard answer", "exemplar response", "perfect solution", "transcendental ideal". Using this format does NOT instantly guarantee any particular mark, grade, or result in any assessment task. At best, it is only an interim step towards your own striving towards excellence.
+:::
+
+# Example diary entry
+
+## 2024-02-01 - Resolving Leaflet issue on macOS
+
+::: {.callout-note}
+# Metadata card
+
+- **Diary entry date:** 01 February 2024
+- **MS5130 learning outcomes:**
+  - #3. Install and exploit open source statistical programming packages.
+  - #5. Create relevant visualisations using advanced statistical programming plotting packages.
+- **MS5130 learning activities:**
+  - MS5130 Week 04 lecture
+  - Work contributing to MS5130 Assignment 1
+:::
+
+**Problem statement:**
+
+When attempting to run R code that calls on the `leaflet` package, the following error occurred as per @fig-no-leaflet-found below:
+
+![No package called `leaflet`?](images/no-leaflet-found.png){#fig-no-leaflet-found width=80%}
+
+
+**Solution statement:**
+
+In order to investigate further, I scrolled through the console output in RStudio. The following part of the console output drew my attention, even though I do not fully understand it, as depicted in @fig-gdcal-config below.
+
+![Something wrong with `gdal-config`?](images/gdal-config.png){#fig-gdcal-config width=80%}
+
+I have never heard of `gdal-config` before, so I performed a Google search for "gdal-config", which directed me to [Stack Overflow #12141422](https://stackoverflow.com/questions/12141422/error-gdal-config-not-found-while-installing-r-dependent-packages-whereas-gdal):
+
+One of the posts on that thread, [#57986572](https://stackoverflow.com/a/57986572), suggested that it is necessary on macOS to install `gdal` at the level of the operating system, using Homebrew, i.e., `brew install gdal`. I therefore performed that step; however, I then received a similar error message about `proj` missing, which prompted me to perform a similar search about `proj`, taking me to Stack Overflow [#30034372](https://stackoverflow.com/a/30034372), which advised me to similarly install `proj` using Homebrew. So, I performed the following overall installation of packages using Homebrew:
+
+```zsh
+brew install gdal proj
+```
+
+At this stage, however, I continued to experience problems with Leaflet in RStudio even though I installed the required underlying packages. The error message that I received was as follows: _"error: libproj or sqlite3 not found in standard or given locations"_.
+
+I performed a Google Search for that exact error message, which took me to a discussion thread on GitHub, [#1894 on r-spatial/sf](https://github.com/r-spatial/sf/issues/1894). The solution was revealed by the user **pat-s** (see [their comment here](https://github.com/r-spatial/sf/issues/1894#issuecomment-1025559431)), who advised a customised version of `install.packages(...)` in RStudio, as follows:
+
+```r
+install.packages("terra", type = "source", configure.args = c("--with-sqlite3-lib=/opt/homebrew/opt/sqlite/lib", "--with-proj-lib=/opt/homebrew/opt/proj/lib"))
+
+install.packages("leaflet", type = "source", configure.args = c("--with-sqlite3-lib=/opt/homebrew/opt/sqlite/lib", "--with-proj-lib=/opt/homebrew/opt/proj/lib"))
+```
+
+Now, once I performed all required steps in both Homebrew and RStudio, it all works!
+
+To contribute to the open-source community using Leaflet in Quarto/RStudio, I made my findings available to the public on GitHub here: https://github.com/blairw/docs-leaflet-rstudio-macos
+
+A happy ending! 😊
